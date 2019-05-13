@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSign", "src\CodeSign\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSignCore", "src\CodeSignCore\CodeSignCore.csproj", "{658CFB1F-D17F-4572-9A73-FC6F02EC0791}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilitatem", "Utilitatem\Utilitatem.csproj", "{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{658CFB1F-D17F-4572-9A73-FC6F02EC0791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{658CFB1F-D17F-4572-9A73-FC6F02EC0791}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{658CFB1F-D17F-4572-9A73-FC6F02EC0791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9CFB92E5-AAC0-4D12-B060-D34DD20A5AAB} = {DC0EEFF6-B502-4D95-A0F9-F021CE8BBA1A}
 		{658CFB1F-D17F-4572-9A73-FC6F02EC0791} = {DC0EEFF6-B502-4D95-A0F9-F021CE8BBA1A}
+		{7B5E4E48-6738-4642-A9E2-6B6D5A97B1EC} = {DC0EEFF6-B502-4D95-A0F9-F021CE8BBA1A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {300B53F4-002E-4DE7-97E1-5ACD170F99F7}
