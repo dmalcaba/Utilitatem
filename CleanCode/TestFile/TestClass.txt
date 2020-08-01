@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CleanCode.TestFile
+{
+    public class TestClass
+    {
+        public void Test1()
+        {
+            if (false)
+                Console.WriteLine("Remove");
+
+            Console.WriteLine("Leave");
+        }
+
+        public void Test2()
+        {
+            if (false)
+                Console.WriteLine("Remove");
+            if (false)
+                Console.WriteLine("Remove");
+
+            Console.WriteLine("Leave");
+        }
+
+
+        public void Test3()
+        {
+            if (false)
+            {
+                Console.WriteLine("Remove");
+                Console.WriteLine("Remove");
+            }
+
+            Console.WriteLine("Leave");
+        }
+    }
+}
