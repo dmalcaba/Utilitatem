@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
+using System.Text;
 
 namespace CleanCode
 {
@@ -32,30 +34,62 @@ namespace CleanCode
         {
             var fileInfo = Path.GetExtension(path);
 
-            if (fileInfo == ".txt")
+            if (fileInfo == ".cs")
             {
                 RewriteFile(path);
-                Console.WriteLine("Processed file '{0}'.", path);
             }
         }
 
         public static void RewriteFile(string path)
         {
             var fileToProcess = $"{path}.old";
+            var workingfile = $"{path}.new";
             File.Move(path, fileToProcess);
 
-            using var fileRead = new StreamReader(fileToProcess);
-            using var fileWrite = new StreamWriter(path);
+            bool fileNeedsCleaning = false;
+
+            using var fileRead = new StreamReader(fileToProcess, Encoding.UTF8);
+            using var fileWrite = new StreamWriter(workingfile, false, Encoding.UTF8);
 
             string line;
+
+            bool onStartFound = false;
+
+            Stack onStartBracketStack = new Stack();
+
 
             bool ifLineFound = false;
             bool openBracketFound = false;
 
             while ((line = fileRead.ReadLine()) != null)
             {
+                if (line.Trim() == "protected override void OnStart()")
+                {
+                    onStartFound = true;
+                }
+
+                if (onStartFound)
+                {
+                    if (line.Trim() == "{")
+                    {
+                        onStartBracketStack.Push("{");
+                    }
+
+                    if (line.Trim() == "}")
+                    {
+                        onStartBracketStack.Pop();
+
+                        if (onStartBracketStack.Count == 0)
+                            onStartFound = false;
+                    }
+
+                    fileWrite.WriteLine(line);
+                    continue;
+                }
+
                 if (line.Trim() == "if (false)")
                 {
+                    fileNeedsCleaning = true;
                     ifLineFound = true;
                     continue;
                 }
@@ -84,11 +118,25 @@ namespace CleanCode
                     continue;
                 }
 
-                fileWrite.WriteLine(line.TrimEnd());
+                fileWrite.WriteLine(line);
             }
 
             fileRead.Close();
-            File.Delete(fileToProcess);
+            fileWrite.Close();
+
+            if (fileNeedsCleaning)
+            {
+                File.Move(workingfile, path);
+                File.Delete(fileToProcess);
+                Console.WriteLine("Processed file '{0}'.", path);
+            }
+            else 
+            {
+                // revert back to original one
+                File.Delete(workingfile);
+                File.Move(fileToProcess, path);
+            }
+
         }
     }
 }
