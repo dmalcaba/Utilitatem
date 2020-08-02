@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CleanCode.TestFile
+{
+    public class Test2Class
+    {
+       ///Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run("Information", "Cheque Number had been used. Select another Cheque Number.", null, 4);
+                        Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run("Information", "No Released Payments.", 0, 4);
+
+    }
+}

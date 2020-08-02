@@ -36,7 +36,69 @@ namespace CleanCode
 
             if (fileInfo == ".cs")
             {
-                RewriteFile(path);
+                ChangeNoRecordsFound(path);
+            }
+        }
+
+        public static void ChangeNoRecordsFound(string path)
+        { 
+            var stringToReplace = "Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run(\"Information\",";
+
+            var fileToProcess = $"{path}.old";
+            var workingfile = $"{path}.new";
+            File.Move(path, fileToProcess);
+
+            bool fileNeedsCleaning = false;
+
+            using var fileRead = new StreamReader(fileToProcess, Encoding.UTF8);
+            using var fileWrite = new StreamWriter(workingfile, false, Encoding.UTF8);
+
+            string line;
+
+            while ((line = fileRead.ReadLine()) != null)
+            {
+                if (line.Contains(stringToReplace))
+                {
+                    fileNeedsCleaning = true;
+
+                    var findInformation = line.IndexOf("Information");
+
+                    var start = line.IndexOf('"', findInformation + 12) + 1;
+                    var end = line.IndexOf('"', start);
+                    var message = line[start..end];
+
+                    var newCode = $"Message.ShowInfo(\"{message}\");";
+
+                    var startReplace = line.IndexOf("Create<Component_Call_Programs");
+                    var endReplace = line.Length;
+                    var oldCode = line[startReplace..endReplace];
+
+                    var newLine = line.Replace(oldCode, newCode);
+
+                    fileWrite.WriteLine(newLine);
+
+                }
+                else
+                {
+                    fileWrite.WriteLine(line);
+                }
+            }
+
+            fileRead.Close();
+            fileWrite.Close();
+
+            if (fileNeedsCleaning)
+            {
+                File.Move(workingfile, path);
+                File.Delete(fileToProcess);
+                Console.WriteLine("Processed file '{0}'.", path);
+            }
+            else
+            {
+                // revert back to original one
+                File.Delete(workingfile);
+                File.Move(fileToProcess, path);
+                Console.Write(".");
             }
         }
 
@@ -54,12 +116,10 @@ namespace CleanCode
             string line;
 
             bool onStartFound = false;
-
             Stack onStartBracketStack = new Stack();
 
-
             bool ifLineFound = false;
-            bool openBracketFound = false;
+            Stack ifLineBracketStack = new Stack();
 
             while ((line = fileRead.ReadLine()) != null)
             {
@@ -96,24 +156,29 @@ namespace CleanCode
 
                 if (line.Trim() == "{" && ifLineFound)
                 {
-                    openBracketFound = true;
+                    ifLineBracketStack.Push(true);
                     continue;
                 }
 
-                if (line.Trim() == "}" && ifLineFound && openBracketFound)
+                if (line.Trim() == "}" && ifLineFound)
+                {
+                    ifLineBracketStack.Pop();
+
+                    if (ifLineBracketStack.Count == 0)
+                        ifLineFound = false;
+
+                    continue;
+                }
+
+                // if (false) is found and the next line doesn't
+                // contain a bracket, ignore the line
+                if (ifLineFound && ifLineBracketStack.Count == 0)
                 {
                     ifLineFound = false;
-                    openBracketFound = false;
                     continue;
                 }
 
-                if (ifLineFound && !openBracketFound)
-                {
-                    ifLineFound = false;
-                    continue;
-                }
-
-                if (ifLineFound && openBracketFound)
+                if (ifLineFound && ifLineBracketStack.Count != 0)
                 {
                     continue;
                 }
@@ -135,6 +200,7 @@ namespace CleanCode
                 // revert back to original one
                 File.Delete(workingfile);
                 File.Move(fileToProcess, path);
+                Console.Write(".");
             }
 
         }
