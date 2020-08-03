@@ -6,8 +6,14 @@ namespace CleanCode.TestFile
 {
     public class Test2Class
     {
+                           Where.Add(CndRange(() => u.Trim(P_AppCode) != "", APPLICATION1.APPL_CODE.IsEqualTo(() => u.Trim(P_AppCode))));
+
        ///Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run("Information", "Cheque Number had been used. Select another Cheque Number.", null, 4);
                         Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run("Information", "No Released Payments.", 0, 4);
+                                    //Where.Add(CndRange(() => iaCodeSubGroup != "", CODES.code_subgroup.IsEqualTo(iaCodeSubGroup)));
+            Where.Add(CndRange(() => ioaCodeType != "", CODES.code_type1.IsEqualTo(ioaCodeType)));
+            Where.Add(CndRange(() => ionCodeValueNum != 0, CODES.code_value_num.IsEqualTo(ionCodeValueNum)));
+           // new stuff
 
     }
 }

@@ -34,12 +34,101 @@ namespace CleanCode
         {
             var fileInfo = Path.GetExtension(path);
 
-            if (fileInfo == ".cs")
+            if (fileInfo == ".txt")
             {
-                ChangeNoRecordsFound(path);
+                CndRangeRefactor(path);
             }
         }
 
+        /// <summary>
+        /// Refactor CndRange; change to use if statement instead
+        /// for better code readability
+        /// </summary>
+        public static void CndRangeRefactor(string path)
+        {
+            var stringToFind = "Where.Add(CndRange(() =>";
+
+            var fileToProcess = $"{path}.old";
+            var workingfile = $"{path}.new";
+            File.Move(path, fileToProcess);
+
+            bool fileNeedsCleaning = false;
+
+            using var fileRead = new StreamReader(fileToProcess, Encoding.UTF8);
+            using var fileWrite = new StreamWriter(workingfile, false, Encoding.UTF8);
+
+            string line;
+
+            while ((line = fileRead.ReadLine()) != null)
+            {
+                if (line.Trim().StartsWith(stringToFind))
+                {
+                    fileNeedsCleaning = true;
+
+                    var codePlacement = line.IndexOf("Where");
+
+                    var padding = line.Substring(0, codePlacement);
+
+                    var getString = line.Split("=> ");
+
+                    if (getString.Length == 2)
+                    {
+                        var cndRangeParam = getString[1].Split(",");
+
+                        if (cndRangeParam.Length == 2)
+                        {
+                            var ifCondition = cndRangeParam[0];
+                            var whereCondition = cndRangeParam[1].Trim();
+
+                            var newLine = new StringBuilder();
+
+                            newLine.AppendLine($"{padding}if ({ifCondition})");
+                            newLine.AppendLine($"{padding}{{");
+                            newLine.AppendLine($"{padding}    Where.Add({whereCondition[0..^3]});");
+                            newLine.Append($"{padding}}}");
+
+                            fileWrite.WriteLine(newLine.ToString());
+                        }
+                        else
+                        {
+                            fileWrite.WriteLine(line);
+                        }
+                    }
+                    else
+                    {
+                        fileWrite.WriteLine(line);
+                    }
+                }
+                else
+                {
+                    fileWrite.WriteLine(line);
+                }
+            }
+
+            fileRead.Close();
+            fileWrite.Close();
+
+            if (fileNeedsCleaning)
+            {
+                File.Move(workingfile, path);
+                File.Delete(fileToProcess);
+                Console.WriteLine("Processed file '{0}'.", path);
+            }
+            else
+            {
+                // revert back to original one
+                File.Delete(workingfile);
+                File.Move(fileToProcess, path);
+                Console.Write(".");
+            }
+        }
+
+
+
+        /// <summary>
+        /// For replacing User32 messagebox to standard message box
+        /// </summary>
+        /// <param name="path"></param>
         public static void ChangeNoRecordsFound(string path)
         { 
             var stringToReplace = "Create<Component_Call_Programs.Functions.I_User32_Messagebox>().Run(\"Information\",";
@@ -102,6 +191,10 @@ namespace CleanCode
             }
         }
 
+        /// <summary>
+        /// For removing unreachable code
+        /// </summary>
+        /// <param name="path"></param>
         public static void RewriteFile(string path)
         {
             var fileToProcess = $"{path}.old";
