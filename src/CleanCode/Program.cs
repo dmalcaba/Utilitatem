@@ -34,11 +34,59 @@ namespace CleanCode
         {
             var fileInfo = Path.GetExtension(path);
 
-            if (fileInfo == ".txt")
+            if (fileInfo == ".cs")
             {
-                CndRangeRefactor(path);
+                RemoveReturnSPID(path);
             }
         }
+
+
+        public static void RemoveReturnSPID(string path)
+        {
+            var stringToFind = "Create<Component_Call_Programs.Functions.IReturnSPID_Char_5>().Run(Application.V_SPID);";
+
+            var fileToProcess = $"{path}.old";
+            var workingfile = $"{path}.new";
+            File.Move(path, fileToProcess);
+
+            bool fileNeedsCleaning = false;
+
+            using var fileRead = new StreamReader(fileToProcess, Encoding.UTF8);
+            using var fileWrite = new StreamWriter(workingfile, false, Encoding.UTF8);
+
+            string line;
+
+            while ((line = fileRead.ReadLine()) != null)
+            {
+                if (line.Contains(stringToFind))
+                {
+                    fileNeedsCleaning = true;
+                }
+                else
+                {
+                    fileWrite.WriteLine(line.TrimEnd());
+                }
+            }
+
+            fileRead.Close();
+            fileWrite.Close();
+
+            if (fileNeedsCleaning)
+            {
+                File.Move(workingfile, path);
+                File.Delete(fileToProcess);
+                Console.WriteLine("Processed file '{0}'.", path);
+            }
+            else
+            {
+                // revert back to original one
+                File.Delete(workingfile);
+                File.Move(fileToProcess, path);
+                Console.Write(".");
+            }
+        }
+
+
 
         /// <summary>
         /// Refactor CndRange; change to use if statement instead
